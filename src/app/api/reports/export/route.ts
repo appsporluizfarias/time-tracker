@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
   });
 
   const header = "Date,Hours,Billable,User,Project,Client,Sprint,Task,Description\n";
-  const rows = entries.map((e) =>
+  const rows = entries.map((e: any) =>
     [
       new Date(e.date).toISOString().split("T")[0],
       e.hours,
