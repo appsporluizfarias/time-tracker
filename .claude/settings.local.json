@@ -20,7 +20,11 @@
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/)",
       "Bash(npx next *)",
       "Bash(mkdir -p \"C:\\\\Projetos\\\\apexio-timer\\\\src\\\\app\\\\api\\\\v1\\\\team\\\\[id]\\\\approve\")",
-      "Bash(mkdir -p \"C:\\\\Projetos\\\\apexio-timer\\\\src\\\\app\\\\api\\\\v1\\\\team\\\\[id]\\\\block\")"
+      "Bash(mkdir -p \"C:\\\\Projetos\\\\apexio-timer\\\\src\\\\app\\\\api\\\\v1\\\\team\\\\[id]\\\\block\")",
+      "Bash(git add *)",
+      "Bash(git restore *)",
+      "Bash(git commit *)",
+      "Bash(git push *)"
     ]
   }
 }
