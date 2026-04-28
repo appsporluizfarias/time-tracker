@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Brand palette */
+  --brand-navy:        #0F1C2E;
+  --brand-navy-light:  #1A2E48;
+  --brand-navy-border: rgba(255,255,255,0.08);
+  --brand-cyan:        #00C9E0;
+  --brand-cyan-dark:   #009AB0;
+  --brand-orange:      #F97316;
+  --brand-orange-dark: #EA580C;
+  --brand-purple:      #7C3AED;
+  --brand-teal:        #14B8A6;
+  --brand-pink:        #EC4899;
+
+  /* Semantic */
+  --background: #ffffff;
+  --foreground: #0F1C2E;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Timer pulse animation */
+@keyframes timer-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+.timer-pulse {
+  animation: timer-pulse 1.5s ease-in-out infinite;
+}
