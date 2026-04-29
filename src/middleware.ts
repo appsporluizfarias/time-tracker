@@ -1,9 +1,8 @@
-import { auth } from "@/lib/auth";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
 
-export default auth((req) => {
-  const { pathname } = req.nextUrl;
-  const isLoggedIn = !!req.auth;
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
 
   const publicPaths = ["/login", "/register", "/api/auth", "/api/register"];
   const isPublic = publicPaths.some((p) => pathname.startsWith(p));
@@ -11,11 +10,26 @@ export default auth((req) => {
   const isApiDocs = pathname.startsWith("/api/docs");
 
   if (isApiV1 || isApiDocs) return NextResponse.next();
-  if (!isLoggedIn && !isPublic) return NextResponse.redirect(new URL("/login", req.url));
-  if (isLoggedIn && pathname === "/login") return NextResponse.redirect(new URL("/dashboard", req.url));
+
+  const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET,
+    cookieName: process.env.NODE_ENV === "production"
+      ? "__Secure-authjs.session-token"
+      : "authjs.session-token",
+  });
+
+  const isLoggedIn = !!token;
+
+  if (!isLoggedIn && !isPublic) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+  if (isLoggedIn && pathname === "/login") {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
 
   return NextResponse.next();
-});
+}
 
 export const config = {
   matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
