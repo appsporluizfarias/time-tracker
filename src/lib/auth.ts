@@ -5,8 +5,11 @@ import bcrypt from "bcryptjs";
 import { db } from "./db";
 import { Role } from "@prisma/client";
 
+const adapter = process.env.DATABASE_URL ? PrismaAdapter(db) : undefined;
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  adapter: PrismaAdapter(db),
+  adapter: adapter,
+  adapter: adapter,
   session: { strategy: "jwt" },
   pages: {
     signIn: "/login",
