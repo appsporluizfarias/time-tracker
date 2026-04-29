@@ -108,12 +108,6 @@ export default function LoginPage() {
             </Link>
           </p>
 
-          <div className="mt-4 rounded-lg bg-gray-50 px-4 py-3 text-xs text-gray-500 dark:bg-gray-800 dark:text-gray-400">
-            <p className="font-medium mb-1">Contas demo:</p>
-            <p>luiznavore@gmail.com / Admin@1234</p>
-            <p>dev1@demo.com / password123</p>
-            <p>viewer@demo.com / password123</p>
-          </div>
         </div>
       </div>
     </div>
