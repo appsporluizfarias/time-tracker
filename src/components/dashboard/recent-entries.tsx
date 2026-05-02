@@ -11,6 +11,7 @@ import Link from "next/link";
 interface Entry {
   id: string;
   date: Date;
+  startAt: Date | null;
   hours: unknown;
   description: string | null;
   billable: boolean;
@@ -66,9 +67,12 @@ function MobileRow({
 
   return (
     <div className="border-b border-gray-100 dark:border-gray-800 last:border-0">
-      <button
+      <div
+        role="button"
+        tabIndex={0}
         onClick={() => setExpanded(!expanded)}
-        className="w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setExpanded(!expanded); }}
+        className="w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors cursor-pointer"
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 min-w-0">
@@ -82,7 +86,7 @@ function MobileRow({
                 {entry.project?.name ?? "Sem projeto"}
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                {format(new Date(entry.date), "dd/MM/yyyy")}
+                {format(new Date(entry.date), "dd/MM/yyyy")}{entry.startAt ? ` ${format(new Date(entry.startAt), "HH:mm")}` : ""}
               </p>
             </div>
           </div>
@@ -95,15 +99,13 @@ function MobileRow({
             />
           </div>
         </div>
-      </button>
+      </div>
 
       {expanded && (
         <div className="px-4 pb-3 space-y-2 bg-gray-50/50 dark:bg-gray-800/30">
-          {entry.task && (
-            <p className="text-xs text-gray-600 dark:text-gray-400">
-              <span className="font-medium">Tarefa:</span> {entry.task.title}
-            </p>
-          )}
+          <p className="text-xs text-gray-600 dark:text-gray-400">
+            <span className="font-medium">Tarefa:</span> {entry.task?.title || entry.description || "—"}
+          </p>
           {entry.description && (
             <p className="text-xs text-gray-600 dark:text-gray-400">
               <span className="font-medium">Descrição:</span> {entry.description}
@@ -191,7 +193,7 @@ export function RecentEntries({ entries, currentUserId, userRole }: RecentEntrie
                   <ReplayButton entry={entry} />
                 </td>
                 <td className="px-6 py-4 text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                  {format(new Date(entry.date), "dd/MM/yyyy")}
+                  {format(new Date(entry.date), "dd/MM/yyyy")}{entry.startAt ? ` ${format(new Date(entry.startAt), "HH:mm")}` : ""}
                 </td>
                 <td className="px-6 py-4">
                   <span className="flex items-center gap-2">
@@ -205,7 +207,7 @@ export function RecentEntries({ entries, currentUserId, userRole }: RecentEntrie
                   </span>
                 </td>
                 <td className="px-6 py-4 text-gray-600 dark:text-gray-400 hidden md:table-cell">
-                  {entry.task?.title ?? "—"}
+                  {entry.task?.title || entry.description || "—"}
                 </td>
                 <td className="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
                   {formatHours(Number(entry.hours))}

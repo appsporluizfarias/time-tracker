@@ -32,7 +32,15 @@ async function getDashboardData(userId: string, role: string) {
     }),
     db.timeEntry.findMany({
       where: userFilter,
-      include: {
+      select: {
+        id: true,
+        date: true,
+        startAt: true,
+        hours: true,
+        description: true,
+        billable: true,
+        osNumber: true,
+        userId: true,
         user: { select: { id: true, name: true } },
         project: { select: { id: true, name: true, color: true } },
         client: { select: { id: true, name: true } },

@@ -24,7 +24,9 @@
       "Bash(git add *)",
       "Bash(git restore *)",
       "Bash(git commit *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Projetos\\\\apexio-timer\" -Directory)",
+      "Bash(Select-Object Name)"
     ]
   }
 }

@@ -179,9 +179,12 @@ function MobileRow({
 
   return (
     <div className="border-b border-gray-100 dark:border-gray-800 last:border-0">
-      <button
+      <div
+        role="button"
+        tabIndex={0}
         onClick={() => setExpanded((v) => !v)}
-        className="w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800/50"
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setExpanded((v) => !v); }}
+        className="w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer"
       >
         <div className="flex items-center gap-2">
           <ReplayButton entry={entry} />
@@ -210,10 +213,15 @@ function MobileRow({
             />
           </div>
         </div>
-      </button>
+      </div>
 
       {expanded && (
         <div className="px-4 pb-3 bg-gray-50/50 dark:bg-gray-800/30 space-y-2">
+          {entry.startAt && (
+            <p className="text-xs text-gray-600 dark:text-gray-400">
+              <span className="font-medium">Início:</span> {format(new Date(entry.startAt), "dd/MM/yyyy HH:mm")}
+            </p>
+          )}
           {entry.osNumber && (
             <p className="text-xs text-gray-600 dark:text-gray-400">
               <span className="font-medium">OS:</span> {entry.osNumber}
@@ -280,6 +288,9 @@ function DesktopRow({
             <span className="text-gray-400 italic text-sm">Sem descrição</span>
           )}
         </p>
+      </td>
+      <td className="px-4 py-3 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+        {entry.startAt ? format(new Date(entry.startAt), "dd/MM HH:mm") : "—"}
       </td>
       <td className="px-4 py-3 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
         {entry.osNumber || "—"}
