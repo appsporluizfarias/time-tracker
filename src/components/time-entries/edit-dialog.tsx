@@ -17,7 +17,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { format } from "date-fns";
 
 interface Entry {
   id: string;
@@ -43,6 +42,11 @@ interface TimeEntryEditDialogProps {
 
 const NONE = "none";
 
+function toDatetimeLocal(value: Date | string): string {
+  const iso = value instanceof Date ? value.toISOString() : String(value);
+  return iso.slice(0, 16); // "YYYY-MM-DDTHH:mm" sem conversão de fuso
+}
+
 export function TimeEntryEditDialog({
   entry,
   onClose,
@@ -51,7 +55,7 @@ export function TimeEntryEditDialog({
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
-    date: format(new Date(entry.date), "yyyy-MM-dd"),
+    date: toDatetimeLocal(entry.date),
     hours: String(Number(entry.hours) || ""),
     description: entry.description ?? "",
     osNumber: entry.osNumber ?? "",
@@ -72,7 +76,8 @@ export function TimeEntryEditDialog({
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        date: new Date(form.date).toISOString(),
+        // Trata o valor do input como UTC para evitar regressão de fuso
+        date: new Date(form.date + ":00.000Z").toISOString(),
         hours: form.hours ? Number(form.hours) : undefined,
         description: form.description,
         osNumber: form.osNumber || null,
@@ -94,28 +99,28 @@ export function TimeEntryEditDialog({
           <DialogTitle>Editar lançamento</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label>Data</Label>
-              <Input
-                type="date"
-                value={form.date}
-                onChange={(e) => setForm({ ...form, date: e.target.value })}
-                className="text-base"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Horas</Label>
-              <Input
-                type="number"
-                step="0.25"
-                min="0.25"
-                max="24"
-                value={form.hours}
-                onChange={(e) => setForm({ ...form, hours: e.target.value })}
-                className="text-base"
-              />
-            </div>
+          <div className="space-y-1.5">
+            <Label>Data e hora de início</Label>
+            <Input
+              type="datetime-local"
+              value={form.date}
+              onChange={(e) => setForm({ ...form, date: e.target.value })}
+              className="text-base w-full"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Duração (horas)</Label>
+            <Input
+              type="number"
+              step="0.25"
+              min="0.25"
+              max="24"
+              value={form.hours}
+              onChange={(e) => setForm({ ...form, hours: e.target.value })}
+              className="text-base"
+              placeholder="ex: 1.5"
+            />
           </div>
 
           <div className="space-y-1.5">
