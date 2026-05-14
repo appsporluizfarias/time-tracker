@@ -16,6 +16,7 @@ const createSchema = z.object({
   clientId: z.string().optional(),
   sprintId: z.string().optional(),
   taskId: z.string().optional(),
+  integratedAt: z.string().datetime().nullable().optional(),
 });
 
 const entryInclude = {
@@ -52,6 +53,10 @@ const entryInclude = {
  *         name: osNumber
  *         schema: { type: string }
  *         description: Partial (case-insensitive) match on OS number
+ *       - in: query
+ *         name: integrated
+ *         schema: { type: string, enum: [true, false] }
+ *         description: "true = only integrated entries, false = only non-integrated entries"
  *     responses:
  *       200:
  *         description: List of time entries
@@ -72,6 +77,7 @@ export async function GET(request: NextRequest) {
   const projectId = searchParams.get("projectId");
   const userId = searchParams.get("userId");
   const osNumber = searchParams.get("osNumber");
+  const integrated = searchParams.get("integrated");
 
   const where: Record<string, unknown> = {};
 
@@ -83,6 +89,8 @@ export async function GET(request: NextRequest) {
 
   if (projectId) where.projectId = projectId;
   if (osNumber) where.osNumber = { contains: osNumber, mode: "insensitive" };
+  if (integrated === "true") where.integratedAt = { not: null };
+  else if (integrated === "false") where.integratedAt = null;
   if (startDate || endDate) {
     where.date = {
       ...(startDate && { gte: new Date(startDate) }),
@@ -149,7 +157,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { osNumber, startAt, endAt, hours, ...rest } = parsed.data;
+  const { osNumber, startAt, endAt, hours, integratedAt, ...rest } = parsed.data;
 
   const entry = await db.timeEntry.create({
     data: {
@@ -160,6 +168,7 @@ export async function POST(request: NextRequest) {
       ...(osNumber && { osNumber }),
       ...(startAt && { startAt: new Date(startAt) }),
       ...(endAt && { endAt: new Date(endAt) }),
+      ...(integratedAt !== undefined && { integratedAt: integratedAt ? new Date(integratedAt) : null }),
     },
     include: entryInclude,
   });

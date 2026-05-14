@@ -14,6 +14,7 @@ const updateSchema = z.object({
   clientId: z.string().optional().nullable(),
   sprintId: z.string().optional().nullable(),
   taskId: z.string().optional().nullable(),
+  integratedAt: z.string().datetime().nullable().optional(),
 });
 
 export async function PUT(
@@ -39,18 +40,19 @@ export async function PUT(
     );
   }
 
-  const { date, hours, description, billable, osNumber, projectId, clientId, sprintId, taskId } = parsed.data;
+  const { date, hours, description, billable, osNumber, projectId, clientId, sprintId, taskId, integratedAt } = parsed.data;
 
-  const updateData: Prisma.TimeEntryUncheckedUpdateInput = {};
+  const updateData: Prisma.TimeEntryUpdateInput = {};
   if (date !== undefined) updateData.date = new Date(date);
   if (hours !== undefined) updateData.hours = hours;
   if (description !== undefined) updateData.description = description;
   if (billable !== undefined) updateData.billable = billable;
   if (osNumber !== undefined) updateData.osNumber = osNumber;
-  if (projectId !== undefined) updateData.projectId = projectId;
-  if (clientId !== undefined) updateData.clientId = clientId;
-  if (sprintId !== undefined) updateData.sprintId = sprintId;
-  if (taskId !== undefined) updateData.taskId = taskId;
+  if (projectId !== undefined) updateData.project = projectId ? { connect: { id: projectId } } : { disconnect: true };
+  if (clientId !== undefined) updateData.client = clientId ? { connect: { id: clientId } } : { disconnect: true };
+  if (sprintId !== undefined) updateData.sprint = sprintId ? { connect: { id: sprintId } } : { disconnect: true };
+  if (taskId !== undefined) updateData.task = taskId ? { connect: { id: taskId } } : { disconnect: true };
+  if (integratedAt !== undefined) updateData.integratedAt = integratedAt ? new Date(integratedAt) : null;
 
   const updated = await db.timeEntry.update({
     where: { id: params.id },

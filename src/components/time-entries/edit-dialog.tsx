@@ -26,6 +26,7 @@ interface Entry {
   description: string | null;
   billable: boolean;
   osNumber?: string | null;
+  integratedAt?: string | null;
   project: { id: string; name: string } | null;
 }
 
@@ -55,6 +56,7 @@ export function TimeEntryEditDialog({
     description: entry.description ?? "",
     osNumber: entry.osNumber ?? "",
     billable: entry.billable,
+    integrated: !!entry.integratedAt,
     projectId: entry.project?.id ?? NONE,
   });
 
@@ -76,6 +78,9 @@ export function TimeEntryEditDialog({
         osNumber: form.osNumber || null,
         billable: form.billable,
         projectId: form.projectId === NONE ? null : form.projectId,
+        integratedAt: form.integrated
+          ? (entry.integratedAt ?? new Date().toISOString())
+          : null,
       }),
     });
     setLoading(false);
@@ -153,15 +158,27 @@ export function TimeEntryEditDialog({
             />
           </div>
 
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="billable-edit"
-              checked={form.billable}
-              onChange={(e) => setForm({ ...form, billable: e.target.checked })}
-              className="h-4 w-4 rounded border-gray-300 text-[#F97316] focus:ring-[#F97316]"
-            />
-            <Label htmlFor="billable-edit">Faturável</Label>
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="billable-edit"
+                checked={form.billable}
+                onChange={(e) => setForm({ ...form, billable: e.target.checked })}
+                className="h-4 w-4 rounded border-gray-300 text-[#F97316] focus:ring-[#F97316]"
+              />
+              <Label htmlFor="billable-edit">Faturável</Label>
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="integrated-edit"
+                checked={form.integrated}
+                onChange={(e) => setForm({ ...form, integrated: e.target.checked })}
+                className="h-4 w-4 rounded border-gray-300 text-[#8B5CF6] focus:ring-[#8B5CF6]"
+              />
+              <Label htmlFor="integrated-edit">Integrado</Label>
+            </div>
           </div>
 
           <div className="flex justify-end gap-3 pt-2">

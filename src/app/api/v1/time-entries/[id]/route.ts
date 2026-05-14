@@ -14,6 +14,7 @@ const patchSchema = z.object({
   clientId: z.string().nullable().optional(),
   sprintId: z.string().nullable().optional(),
   taskId: z.string().nullable().optional(),
+  integratedAt: z.string().datetime().nullable().optional(),
 });
 
 const entryInclude = {
@@ -72,6 +73,7 @@ const entryInclude = {
  *               clientId: { type: string, nullable: true }
  *               sprintId: { type: string, nullable: true }
  *               taskId: { type: string, nullable: true }
+ *               integratedAt: { type: string, format: date-time, nullable: true, description: "ISO 8601 timestamp to mark as integrated, or null to clear" }
  *     responses:
  *       200:
  *         description: Updated time entry
@@ -136,18 +138,19 @@ export async function PATCH(
     );
   }
 
-  const { date, hours, description, billable, osNumber, projectId, clientId, sprintId, taskId } = parsed.data;
+  const { date, hours, description, billable, osNumber, projectId, clientId, sprintId, taskId, integratedAt } = parsed.data;
 
-  const updateData: Prisma.TimeEntryUncheckedUpdateInput = {};
+  const updateData: Prisma.TimeEntryUpdateInput = {};
   if (date !== undefined) updateData.date = new Date(date);
   if (hours !== undefined) updateData.hours = hours;
   if (description !== undefined) updateData.description = description;
   if (billable !== undefined) updateData.billable = billable;
   if (osNumber !== undefined) updateData.osNumber = osNumber;
-  if (projectId !== undefined) updateData.projectId = projectId;
-  if (clientId !== undefined) updateData.clientId = clientId;
-  if (sprintId !== undefined) updateData.sprintId = sprintId;
-  if (taskId !== undefined) updateData.taskId = taskId;
+  if (projectId !== undefined) updateData.project = projectId ? { connect: { id: projectId } } : { disconnect: true };
+  if (clientId !== undefined) updateData.client = clientId ? { connect: { id: clientId } } : { disconnect: true };
+  if (sprintId !== undefined) updateData.sprint = sprintId ? { connect: { id: sprintId } } : { disconnect: true };
+  if (taskId !== undefined) updateData.task = taskId ? { connect: { id: taskId } } : { disconnect: true };
+  if (integratedAt !== undefined) updateData.integratedAt = integratedAt ? new Date(integratedAt) : null;
 
   const updated = await db.timeEntry.update({
     where: { id: params.id },

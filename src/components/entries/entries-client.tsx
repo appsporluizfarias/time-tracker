@@ -41,6 +41,7 @@ interface Entry {
   osNumber: string | null;
   startAt: string | null;
   endAt: string | null;
+  integratedAt: string | null;
   userId: string;
   user: { id: string; name: string | null };
   project: { id: string; name: string; color: string } | null;
@@ -238,9 +239,14 @@ function MobileRow({
             </p>
           )}
           <div className="flex items-center justify-between pt-1">
-            <Badge variant={entry.billable ? "success" : "outline"} className="text-xs">
-              {entry.billable ? "Faturável" : "Não faturável"}
-            </Badge>
+            <div className="flex items-center gap-1.5">
+              <Badge variant={entry.billable ? "success" : "outline"} className="text-xs">
+                {entry.billable ? "Faturável" : "Não faturável"}
+              </Badge>
+              <Badge variant={entry.integratedAt ? "default" : "outline"} className="text-xs">
+                {entry.integratedAt ? "Integrado" : "Não integrado"}
+              </Badge>
+            </div>
             {canEdit && (
               <div className="flex gap-1">
                 <button
@@ -314,6 +320,13 @@ function DesktopRow({
       <td className="px-4 py-3 hidden lg:table-cell">
         {entry.billable ? (
           <span className="text-[#14B8A6] text-xs font-medium">💰 Faturável</span>
+        ) : (
+          <span className="text-gray-400 text-xs">—</span>
+        )}
+      </td>
+      <td className="px-4 py-3 hidden lg:table-cell">
+        {entry.integratedAt ? (
+          <span className="text-[#8B5CF6] text-xs font-medium">✓ Integrado</span>
         ) : (
           <span className="text-gray-400 text-xs">—</span>
         )}

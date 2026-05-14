@@ -16,6 +16,7 @@ const createSchema = z.object({
   clientId: z.string().optional().nullable(),
   sprintId: z.string().optional().nullable(),
   taskId: z.string().optional().nullable(),
+  integratedAt: z.string().datetime().nullable().optional(),
 });
 
 export async function GET(request: NextRequest) {
