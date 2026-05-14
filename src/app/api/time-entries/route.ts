@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { z } from "zod";
 import { fireWebhooks } from "@/lib/webhooks";
+import { spDayStart, spDayEnd } from "@/lib/tz";
 
 const createSchema = z.object({
   date: z.string(),
@@ -49,8 +50,8 @@ export async function GET(request: NextRequest) {
   else if (billable === "false") where.billable = false;
   if (startDate || endDate) {
     where.date = {
-      ...(startDate && { gte: new Date(startDate) }),
-      ...(endDate && { lte: new Date(endDate) }),
+      ...(startDate && { gte: spDayStart(startDate) }),
+      ...(endDate && { lte: spDayEnd(endDate) }),
     };
   }
 

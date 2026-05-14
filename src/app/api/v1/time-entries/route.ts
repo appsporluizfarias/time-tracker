@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { authenticateApiToken } from "@/lib/api-auth";
 import { fireWebhooks } from "@/lib/webhooks";
 import { z } from "zod";
+import { spDayStart, spDayEnd } from "@/lib/tz";
 
 const createSchema = z.object({
   date: z.string().datetime(),
@@ -93,8 +94,8 @@ export async function GET(request: NextRequest) {
   else if (integrated === "false") where.integratedAt = null;
   if (startDate || endDate) {
     where.date = {
-      ...(startDate && { gte: new Date(startDate) }),
-      ...(endDate && { lte: new Date(endDate) }),
+      ...(startDate && { gte: spDayStart(startDate) }),
+      ...(endDate && { lte: spDayEnd(endDate) }),
     };
   }
 
