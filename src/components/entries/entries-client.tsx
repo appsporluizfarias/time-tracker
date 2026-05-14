@@ -8,7 +8,7 @@ import {
   startOfMonth,
   endOfMonth,
 } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { spDate, fmtSP } from "@/lib/tz";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -109,13 +109,14 @@ function formatTotalHours(hours: number): string {
 }
 
 function getDayLabel(dateKey: string): string {
-  const todayKey = new Date().toISOString().slice(0, 10);
-  const yesterdayKey = new Date(Date.now() - 864e5).toISOString().slice(0, 10);
+  const todayKey = spDate(new Date());
+  const yesterdayKey = spDate(Date.now() - 864e5);
 
+  // T12:00:00Z garante que o fuso SP (UTC-3) ainda caia no mesmo dia do dateKey
   const date = new Date(dateKey + "T12:00:00Z");
-  const weekday = format(date, "EEE", { locale: ptBR });
-  const cap = weekday.charAt(0).toUpperCase() + weekday.slice(1);
-  const full = format(date, "dd MMM yyyy", { locale: ptBR });
+  const weekday = fmtSP(date, { weekday: "short" });
+  const cap = weekday.charAt(0).toUpperCase() + weekday.slice(1).replace(".", "");
+  const full = fmtSP(date, { day: "2-digit", month: "short", year: "numeric" });
   const base = `${cap}, ${full}`;
 
   if (dateKey === todayKey) return `Hoje — ${base}`;
@@ -220,7 +221,8 @@ function MobileRow({
         <div className="px-4 pb-3 bg-gray-50/50 dark:bg-gray-800/30 space-y-2">
           {entry.startAt && (
             <p className="text-xs text-gray-600 dark:text-gray-400">
-              <span className="font-medium">Início:</span> {format(new Date(entry.startAt), "dd/MM/yyyy HH:mm")}
+              <span className="font-medium">Início:</span>{" "}
+              {fmtSP(entry.startAt, { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false })}
             </p>
           )}
           {entry.osNumber && (
@@ -296,7 +298,7 @@ function DesktopRow({
         </p>
       </td>
       <td className="px-4 py-3 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
-        {entry.startAt ? format(new Date(entry.startAt), "dd/MM HH:mm") : "—"}
+        {entry.startAt ? fmtSP(entry.startAt, { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }) : "—"}
       </td>
       <td className="px-4 py-3 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
         {entry.osNumber || "—"}
@@ -442,7 +444,7 @@ function FilterBar({
   function setQuick(period: "today" | "week" | "month") {
     const now = new Date();
     if (period === "today") {
-      const d = now.toISOString().slice(0, 10);
+      const d = spDate(now);
       setFilters((f) => ({ ...f, startDate: d, endDate: d }));
     } else if (period === "week") {
       setFilters((f) => ({
@@ -676,7 +678,7 @@ export function EntriesClient({
   const grouped = useMemo(() => {
     const map = new Map<string, Entry[]>();
     for (const entry of entries) {
-      const key = String(entry.date).slice(0, 10);
+      const key = spDate(entry.date);
       if (!map.has(key)) map.set(key, []);
       map.get(key)!.push(entry);
     }

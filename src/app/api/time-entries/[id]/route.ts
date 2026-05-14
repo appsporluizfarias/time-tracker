@@ -6,6 +6,8 @@ import { z } from "zod";
 
 const updateSchema = z.object({
   date: z.string().optional(),
+  startAt: z.string().datetime().nullable().optional(),
+  endAt: z.string().datetime().nullable().optional(),
   hours: z.number().positive().max(24).optional(),
   description: z.string().optional(),
   billable: z.boolean().optional(),
@@ -40,10 +42,12 @@ export async function PUT(
     );
   }
 
-  const { date, hours, description, billable, osNumber, projectId, clientId, sprintId, taskId, integratedAt } = parsed.data;
+  const { date, startAt, endAt, hours, description, billable, osNumber, projectId, clientId, sprintId, taskId, integratedAt } = parsed.data;
 
   const updateData: Prisma.TimeEntryUpdateInput = {};
   if (date !== undefined) updateData.date = new Date(date);
+  if (startAt !== undefined) updateData.startAt = startAt ? new Date(startAt) : null;
+  if (endAt !== undefined) updateData.endAt = endAt ? new Date(endAt) : null;
   if (hours !== undefined) updateData.hours = hours;
   if (description !== undefined) updateData.description = description;
   if (billable !== undefined) updateData.billable = billable;

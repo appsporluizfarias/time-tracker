@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { spDatetimeInput, spInputToISO } from "@/lib/tz";
 import {
   Dialog,
   DialogContent,
@@ -21,6 +22,7 @@ import {
 interface Entry {
   id: string;
   date: Date | string;
+  startAt: Date | string | null;
   hours: unknown;
   description: string | null;
   billable: boolean;
@@ -42,10 +44,6 @@ interface TimeEntryEditDialogProps {
 
 const NONE = "none";
 
-function toDatetimeLocal(value: Date | string): string {
-  const iso = value instanceof Date ? value.toISOString() : String(value);
-  return iso.slice(0, 16); // "YYYY-MM-DDTHH:mm" sem conversão de fuso
-}
 
 export function TimeEntryEditDialog({
   entry,
@@ -55,7 +53,7 @@ export function TimeEntryEditDialog({
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
-    date: toDatetimeLocal(entry.date),
+    date: spDatetimeInput(entry.startAt ?? entry.date),
     hours: String(Number(entry.hours) || ""),
     description: entry.description ?? "",
     osNumber: entry.osNumber ?? "",
@@ -72,13 +70,20 @@ export function TimeEntryEditDialog({
 
   async function handleSave() {
     setLoading(true);
+    const startAt = spInputToISO(form.date);
+    const hours = form.hours ? Number(form.hours) : undefined;
+    const endAt = hours
+      ? new Date(new Date(startAt).getTime() + hours * 3_600_000).toISOString()
+      : null;
+
     await fetch(`/api/time-entries/${entry.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        // Trata o valor do input como UTC para evitar regressão de fuso
-        date: new Date(form.date + ":00.000Z").toISOString(),
-        hours: form.hours ? Number(form.hours) : undefined,
+        date: startAt,
+        startAt,
+        endAt,
+        hours,
         description: form.description,
         osNumber: form.osNumber || null,
         billable: form.billable,

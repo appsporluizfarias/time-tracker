@@ -1,6 +1,6 @@
 "use client";
 
-import { format } from "date-fns";
+import { fmtSP } from "@/lib/tz";
 import { formatHours } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Play, Trash2, ChevronDown, ArrowRight } from "lucide-react";
@@ -86,7 +86,7 @@ function MobileRow({
                 {entry.project?.name ?? "Sem projeto"}
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                {format(new Date(entry.date), "dd/MM/yyyy")}{entry.startAt ? ` ${format(new Date(entry.startAt), "HH:mm")}` : ""}
+                {fmtSP(entry.date, { day: "2-digit", month: "2-digit", year: "numeric" })}{entry.startAt ? ` ${fmtSP(entry.startAt, { hour: "2-digit", minute: "2-digit", hour12: false })}` : ""}
               </p>
             </div>
           </div>
@@ -193,7 +193,7 @@ export function RecentEntries({ entries, currentUserId, userRole }: RecentEntrie
                   <ReplayButton entry={entry} />
                 </td>
                 <td className="px-6 py-4 text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                  {format(new Date(entry.date), "dd/MM/yyyy")}{entry.startAt ? ` ${format(new Date(entry.startAt), "HH:mm")}` : ""}
+                  {fmtSP(entry.date, { day: "2-digit", month: "2-digit", year: "numeric" })}{entry.startAt ? ` ${fmtSP(entry.startAt, { hour: "2-digit", minute: "2-digit", hour12: false })}` : ""}
                 </td>
                 <td className="px-6 py-4">
                   <span className="flex items-center gap-2">
