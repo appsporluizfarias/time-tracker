@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
+import { serializeEntry } from "@/lib/tz";
 
 const updateSchema = z.object({
   date: z.string().optional(),
@@ -70,7 +71,7 @@ export async function PUT(
     },
   });
 
-  return NextResponse.json(updated);
+  return NextResponse.json(serializeEntry(updated));
 }
 
 export async function DELETE(

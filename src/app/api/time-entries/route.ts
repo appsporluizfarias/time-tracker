@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { z } from "zod";
 import { fireWebhooks } from "@/lib/webhooks";
-import { spDayStart, spDayEnd } from "@/lib/tz";
+import { spDayStart, spDayEnd, serializeEntry } from "@/lib/tz";
 
 const createSchema = z.object({
   date: z.string(),
@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
     orderBy: { date: "desc" },
   });
 
-  return NextResponse.json(entries);
+  return NextResponse.json(entries.map(serializeEntry));
 }
 
 export async function POST(request: NextRequest) {
@@ -110,5 +110,5 @@ export async function POST(request: NextRequest) {
 
   await fireWebhooks("time_entry.created", entry);
 
-  return NextResponse.json(entry, { status: 201 });
+  return NextResponse.json(serializeEntry(entry), { status: 201 });
 }

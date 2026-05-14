@@ -21,6 +21,41 @@ export function spInputToISO(localInput: string): string {
 }
 
 /**
+ * Converte uma Date UTC para string ISO 8601 com offset SP (-03:00).
+ * "2026-05-13T00:49:00.000Z" → "2026-05-12T21:49:00.000-03:00"
+ */
+export function toSPIso(date: Date | null | undefined): string | null {
+  if (date == null) return null;
+  const shifted = new Date(date.getTime() - 3 * 60 * 60 * 1000);
+  return shifted.toISOString().replace("Z", "-03:00");
+}
+
+/**
+ * Serializa todos os campos DateTime de um time entry para o fuso SP.
+ * Use antes de devolver a resposta JSON nas rotas.
+ */
+export function serializeEntry<
+  T extends {
+    date: Date;
+    startAt: Date | null;
+    endAt: Date | null;
+    createdAt: Date;
+    updatedAt: Date;
+    integratedAt: Date | null;
+  },
+>(entry: T) {
+  return {
+    ...entry,
+    date: toSPIso(entry.date)!,
+    startAt: toSPIso(entry.startAt),
+    endAt: toSPIso(entry.endAt),
+    createdAt: toSPIso(entry.createdAt)!,
+    updatedAt: toSPIso(entry.updatedAt)!,
+    integratedAt: toSPIso(entry.integratedAt),
+  };
+}
+
+/**
  * Converte "YYYY-MM-DD" (data SP) para o início desse dia em UTC.
  * Brasil = UTC-3 fixo (sem horário de verão desde 2019).
  */

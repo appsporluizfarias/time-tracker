@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { authenticateApiToken } from "@/lib/api-auth";
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
+import { serializeEntry } from "@/lib/tz";
 
 const patchSchema = z.object({
   date: z.string().datetime().optional(),
@@ -108,7 +109,7 @@ export async function GET(
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  return NextResponse.json(entry);
+  return NextResponse.json(serializeEntry(entry));
 }
 
 export async function PATCH(
@@ -158,5 +159,5 @@ export async function PATCH(
     include: entryInclude,
   });
 
-  return NextResponse.json(updated);
+  return NextResponse.json(serializeEntry(updated));
 }
