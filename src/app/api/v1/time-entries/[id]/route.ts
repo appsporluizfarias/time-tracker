@@ -15,7 +15,7 @@ const patchSchema = z.object({
   clientId: z.string().nullable().optional(),
   sprintId: z.string().nullable().optional(),
   taskId: z.string().nullable().optional(),
-  integratedAt: z.string().datetime().nullable().optional(),
+  integratedAt: z.string().datetime({ offset: true }).optional(),
 });
 
 const entryInclude = {
